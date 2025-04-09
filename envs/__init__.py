@@ -1,5 +1,6 @@
-import gymnasium as gym
-import envs.simulation_env  # important pour que l'environnement soit bien enregistré
+from .realistic_pendulum import RealisticPendulumEnv
 
-env = gym.make("CartPoleReal-v1")
-
+# Force l'enregistrement dès l'import du package `envs`
+from gymnasium.envs.registration import register
+from gymnasium.envs.classic_control.pendulum import PendulumEnv
+from .dangerous_pendulum import DangerousPendulumEnv

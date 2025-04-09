@@ -1,21 +1,38 @@
 import gymnasium as gym
-import envs.simulation_env  # importe l’enregistrement de l'env personnalisé
-from stable_baselines3 import DQN
-from stable_baselines3.common.evaluation import evaluate_policy
+import envs
+from stable_baselines3 import SAC
+from envs.shielding_wrapper import ShieldingWrapper
+
+def run_episode(env, model, max_steps=300):
+    obs, _ = env.reset()
+    done, total_reward = False, 0
+    step_count = 0
+
+    while not done and step_count < max_steps:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, terminated, truncated, _ = env.step(action)
+        done = terminated or truncated
+        total_reward += reward
+        step_count += 1
+
+    print(f"→ Blocages de sécurité : {env.shield_count}")
+    for entry in env.shield_log:
+        print(f"  - θ = {entry['angle_deg']:.1f}°, action = {entry['original_action']:.2f}")
+    return total_reward
 
 def main():
-    # Charge le modèle entraîné sur l'environnement de simulation
-    model = DQN.load("models/dqn_cartpole")
+    model = SAC.load("models/sac_pendulum")
+    base_env = gym.make("PendulumDangerous-v1", render_mode=None)
+    env = ShieldingWrapper(base_env)
 
-    # Crée l'environnement "réel" (modifié)
-    env = gym.make("CartPoleReal-v1", render_mode="human")
+    rewards = []
+    for i in range(5):
+        print(f"\n--- Épisode {i+1} ---")
+        r = run_episode(env, model)
+        rewards.append(r)
 
-    # Évalue la politique dans le nouvel environnement
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10, render=True)
-
-    print(f"Récompense moyenne (réalité modifiée) : {mean_reward:.2f} ± {std_reward:.2f}")
-
-    env.close()
+    print(f"\nRécompense moyenne sur 5 épisodes : {np.mean(rewards):.2f}")
 
 if __name__ == "__main__":
+    import numpy as np
     main()
