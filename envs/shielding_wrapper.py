@@ -6,14 +6,18 @@ class ShieldingWrapper(Wrapper):
         super().__init__(env)
         self.angle_threshold = angle_threshold
         self.shield_count = 0
+        self.total_steps = 0
         self.shield_log = []
 
     def reset(self, **kwargs):
         self.shield_count = 0
         self.shield_log = []
+        self.total_steps = 0
         return self.env.reset(**kwargs)
 
     def step(self, action):
+        self.total_steps += 1  # Compte le nombre total d'actions proposées
+
         # On récupère l'état actuel via l'observation précédente
         # Gymnasium donne self.env.unwrapped.state, mais on ne doit pas y toucher directement
         # On va estimer l'angle en fonction de l'observation envoyée par step
@@ -35,3 +39,8 @@ class ShieldingWrapper(Wrapper):
             obs, reward, terminated, truncated, info = self.env.step(np.array([0.0]))
 
         return obs, reward, terminated, truncated, info
+
+    def safety_score(self):
+        if self.total_steps == 0:
+            return 100.0
+        return 100 * (1 - self.shield_count / self.total_steps)
