@@ -14,10 +14,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import envs  # maintenant Python peut le trouver
 
+def evaluate_transfer(env_name, model_path, n_episodes=10):
 
-def evaluate_transfer(env_name, model_path, n_episodes=5):
-    """Évalue le transfert sim2real avec différentes perturbations"""
     results = {}
+    max_steps = 300 
 
     for g in [9.81, 11.0, 15.0]:
         print(f"\n🌍 Gravité g = {g}")
@@ -29,24 +29,25 @@ def evaluate_transfer(env_name, model_path, n_episodes=5):
             obs = env.reset()
             done = False
             ep_reward = 0
-            while not done:
+
+            for _ in range(max_steps):  
                 action, _ = model.predict(obs)
                 obs, reward, done, _ = env.step(action)
                 ep_reward += reward
+                if done:
+                    break
+
             rewards.append(ep_reward)
 
         results[f"g={g}"] = np.mean(rewards)
 
-
-    # Création du dossier s'il n'existe pas
+    # Affichage du graphe
     os.makedirs("results", exist_ok=True)
-
-    plt.bar(results.keys(), results.values(), color='cornflowerblue')
+    plt.bar(results.keys(), results.values(), color='steelblue')
     plt.title("Robustesse aux changements de gravité")
     plt.ylabel("Récompense moyenne")
     plt.tight_layout()
     plt.savefig("results/gravity_transfer.png")
     plt.show()
-
 if __name__ == "__main__":
     evaluate_transfer("PendulumDangerous-v1", "models/sac_pendulum")

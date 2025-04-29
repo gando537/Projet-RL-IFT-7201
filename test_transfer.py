@@ -81,9 +81,11 @@ def main():
         safety_without.append(s)
 
     plot_rewards_and_safety(rewards_with, rewards_without, safety_with, safety_without)
+    print("Evaluation du transfert")
+
 
 if __name__ == "__main__":
     main()
 
 # Exécute evaluate_transfer.py juste après
-# subprocess.run(["python", "src/evaluate_transfer.py"])
+subprocess.run(["python", "src/evaluate_transfer.py"])
