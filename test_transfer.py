@@ -48,6 +48,7 @@ def plot_rewards_and_safety(rewards_with, rewards_without, safety_with, safety_w
     axs[1].grid(axis='y')
 
     plt.tight_layout()
+    plt.savefig("results/comparaison_shielding.png")
     plt.show()
 
 def make_env(shielded=False):
