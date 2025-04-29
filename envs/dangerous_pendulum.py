@@ -4,11 +4,13 @@ from gymnasium.envs.classic_control.pendulum import PendulumEnv
 from gymnasium.envs.registration import register
 
 class DangerousPendulumEnv(PendulumEnv):
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, g=15.0):
         super().__init__(render_mode=render_mode)
         self.max_torque = 0.5     # moteur très limité
         self.max_speed = 12
-        self.g = 15.0             # gravité plus forte
+        # self.g = 15.0             # gravité plus forte
+        self.g = g
+        
 
     def step(self, action):
         obs, reward, terminated, truncated, info = super().step(action)
@@ -27,3 +29,4 @@ register(
     id="PendulumDangerous-v1",
     entry_point="envs.dangerous_pendulum:DangerousPendulumEnv",
 )
+

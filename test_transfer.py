@@ -4,6 +4,7 @@ import envs
 import numpy as np
 from stable_baselines3 import SAC
 from envs.shielding_wrapper import ShieldingWrapper
+import subprocess
 
 def run_episode(env, model, max_steps=300):
     obs, _ = env.reset()
@@ -83,3 +84,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Exécute evaluate_transfer.py juste après
+# subprocess.run(["python", "src/evaluate_transfer.py"])
