@@ -20,7 +20,7 @@ def evaluate_transfer(env_name, model_path, n_episodes=10):
     max_steps = 300 
 
     for g in [9.81, 11.0, 15.0]:
-        print(f"\n🌍 Gravité g = {g}")
+        print(f"\n Gravité g = {g}")
         env = DummyVecEnv([lambda: gym.make(env_name, g=g)])
         model = SAC.load(model_path)
 
